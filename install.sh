@@ -89,6 +89,8 @@ DOWNLOAD_FILES=(
 "helper/app.py"
 "helper/prep_ocr.py"
 "helper/Dockerfile"
+"paperless_on.png"
+"paperless_off.png"
 )
 
 for r_path in "${DOWNLOAD_FILES[@]}"; do
