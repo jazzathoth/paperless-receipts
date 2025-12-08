@@ -1,0 +1,88 @@
+# Docker Compose file for running paperless from the Docker Hub.
+# This file contains everything paperless needs to run.
+# Paperless supports amd64, arm and arm64 hardware.
+#
+# All compose files of paperless configure paperless in the following way:
+#
+# - Paperless is (re)started on system boot, if it was running before shutdown.
+# - Docker volumes for storing data are managed by Docker.
+# - Folders for importing and exporting files are created in the same directory
+#   as this file and mounted to the correct folders inside the container.
+# - Paperless listens on port 8000.
+#
+# In addition to that, this Docker Compose file adds the following optional
+# configurations:
+#
+# - Instead of SQLite (default), PostgreSQL is used as the database server.
+#
+# To install and update paperless with this file, do the following:
+#
+# - Copy this file as 'docker-compose.yml' and the files 'docker-compose.env'
+#   and '.env' into a folder.
+# - Run 'docker compose pull'.
+# - Run 'docker compose up -d'.
+#
+# For more extensive installation and update instructions, refer to the
+# documentation.
+services:
+  broker:
+    image: docker.io/library/redis:8
+    restart: unless-stopped
+    volumes:
+      - redisdata:/data
+  db:
+    image: docker.io/library/postgres:18
+    restart: unless-stopped
+    volumes:
+      - ${PAPERLESS_DATA_DIR}/Database:/var/lib/postgresql
+    environment:
+      POSTGRES_DB: paperless
+      POSTGRES_USER: paperless
+      POSTGRES_PASSWORD: paperless
+  webserver:
+    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    restart: unless-stopped
+    depends_on:
+      - db
+      - broker
+    ports:
+      - "8000:8000"
+    volumes:
+      - ${PAPERLESS_DATA_DIR}/Data:/usr/src/paperless/data
+      - ${PAPERLESS_DATA_DIR}/Media:/usr/src/paperless/media
+      - ${PAPERLESS_DATA_DIR}/export:/usr/src/paperless/export
+      - ./Scripts:/scripts
+      - ${PAPERLESS_DATA_DIR}/Logs:/tmp/paperless_test_logs
+      - ${PAPERLESS_DATA_DIR}/cache:/pred_cache
+      - ${CONSUME_DIR}:/usr/src/paperless/consume
+    env_file: docker-compose.env
+    environment:
+      PAPERLESS_REDIS: redis://broker:6379
+      PAPERLESS_DBHOST: db
+      PAPERLESS_OCR_LANGUAGE: eng
+      PAPERLESS_OCR_MODE: skip
+      PAPERLESS_OCR_USER_ARGS: '{"tesseract_pagesegmode": 11}'
+      PAPERLESS_OCR_ROTATE_PAGES: "true"
+      PAPERLESS_OCR_ROTATE_PAGES_THRESHOLD: "8"
+      PAPERLESS_POST_CONSUME_SCRIPT: /scripts/post_consume.py
+      PAPERLESS_API_URL: http://webserver:8000
+      # Go to the paperless ui to generate a user key and paste here
+      PAPERLESS_API_KEY: "<Your Key Here>"
+      HELPER_URL: http://helper:5000
+  helper:
+    build: ./helper
+    depends_on: 
+      - webserver
+    volumes:
+      - ${PAPERLESS_DATA_DIR}/cache:/pred_cache
+      - ${PAPERLESS_DATA_DIR}/logs:/tmp/paperless_test_logs
+      - ./helper/models:/models
+    environment:
+      PAPERLESS_API_URL: http://webserver:8000
+      # Go to the paperless ui to generate a user key and paste here
+      PAPERLESS_API_KEY: "<Your Key Here>"
+      # The location of your model's gguf file. You may use other models. Update file name here.
+      LLM_MODEL_PATH: "/models/Phi-3-mini-4k-instruct-q4.gguf"
+      LLM_N_THREADS: 8
+volumes:
+  redisdata:
