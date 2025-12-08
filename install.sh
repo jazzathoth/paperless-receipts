@@ -87,7 +87,7 @@ DOWNLOAD_FILES=(
 "docker-compose.yml"
 "paperless_receipts.bin"
 "helper/app.py"
-"helper/ocr_prep.py"
+"helper/prep_ocr.py"
 "helper/Dockerfile"
 )
 
