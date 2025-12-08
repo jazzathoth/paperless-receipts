@@ -131,7 +131,12 @@ else
   echo "Creating docker-compose.env..."
 
 
-  SECRET="$(tr -dc 'A-Za-z0-9' </dev/urandom | head -c 64)"
+  SECRET="$(tr -dc 'A-Za-z0-9' </dev/urandom | head -c 64 || true)"
+
+  if [ -z "$SECRET" ]; then
+    echo "Failed to generate random secret key."
+    exit 1
+  fi
 
   cat >"$DC_ENV_FILE" <<EOF
 PAPERLESS_URL=http://127.0.0.1:8000
