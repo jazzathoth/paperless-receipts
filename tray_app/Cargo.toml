@@ -1,0 +1,9 @@
+[package]
+name = "paperless_receipts"
+version = "0.0.1"
+edition = "2024"
+
+[dependencies]
+tray-icon = "0.21"
+image = "0.25"
+
