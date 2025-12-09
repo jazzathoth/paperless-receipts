@@ -265,12 +265,18 @@ while IFS= read -r field; do
 
 FINISHED_CF_NAME="Finished"  # or whatever the name actually is in Paperless
 
-FINISHED_CF_ID="$(
+CF_JSON="$(
   curl -sS -u "$USERNAME:$PASSWORD" \
-       "$PAPERLESS_URL/api/custom_fields/" \
-  | jq -r --arg name "$FINISHED_CF_NAME" \
-      '.results[] | select(.name == $name) | .id' \
+       "$PAPERLESS_URL/api/custom_fields/?page_size=1000"
 )"
+
+
+FINISHED_CF_ID="$(
+  echo "$CF_JSON" \
+  | jq -r --arg name "$FINISHED_CF_NAME" \
+      '.results[] | select(.name == $name) | .id'
+)"
+
 
 if [ -z "$FINISHED_CF_ID" ] || [ "$FINISHED_CF_ID" = "null" ]; then
   echo "ERROR: Could not find custom field named '$FINISHED_CF_NAME'."
@@ -280,6 +286,10 @@ fi
 
 echo "Using finished custom field id: $FINISHED_CF_ID"
 
+CF_ID_LIST="$(
+  echo "$CF_JSON" \
+  | jq '[.results[].id]'
+)"
 
 while IFS= read -r wf; do
   echo "Posting workflow payload:"
@@ -296,12 +306,23 @@ while IFS= read -r wf; do
   echo "-------------------------------------------"
   sleep 1
 done < <(
-  jq -c --argjson finished_id "$FINISHED_CF_ID" '
+  jq -c \
+    --argjson finished_id "$FINISHED_CF_ID" \
+    --argjson cf_ids "$CF_ID_LIST" \
+    '
     .workflows[]
     # strip top-level id if present
     | del(.id)
     # drop ids inside actions & triggers & webhook if they exist
-    | .actions  |= (map(del(.id) | if .webhook? then .webhook |= del(.id) else . end))
+    | .actions  |= (map(del(.id) | if .webhook? then .webhook |= del(.id) else . end
+      | .assign_custom_fields = $cf_ids
+      | .assign_custom_fields_values =
+        (reduce $cf_ids[] as $id ({}; . + {
+          ($id|tostring):
+            (if $id == $finished_id then false else null end)
+        }))
+
+    ))
     | .triggers |= (map(del(.id)))
     # rewrite filter_custom_field_query only where it is non-null
     | .triggers |= (map(
