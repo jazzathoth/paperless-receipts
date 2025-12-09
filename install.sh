@@ -47,7 +47,7 @@ if command -v timedatectl >/dev/null 2>&1; then
     TZ_CHOICE="$MANUAL_TZ"
   fi
 
-  if ! timedatectl list-timezones | grep -Fxq "$TZ_CHOICE"; then
+  if ! timedatectl list-timezones | grep -F "$TZ_CHOICE"; then
     echo "Warning: '$TZ_CHOICE' is not a known timezone. Please try again."
     exit 1
   fi
