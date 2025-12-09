@@ -158,6 +158,7 @@ EOF
 
 # Generate docker-compose.env
 DC_ENV_FILE="$APP_DIR/docker-compose.env"
+PAPERLESS_URL="http://127.0.0.1:8000"
 
 if [ -f "$DC_ENV_FILE" ]; then
   echo "docker-compose.env already exists, leaving it as-is."
@@ -173,7 +174,7 @@ else
   fi
 
   cat >"$DC_ENV_FILE" <<EOF
-PAPERLESS_URL=http://127.0.0.1:8000
+PAPERLESS_URL=$PAPERLESS_URL
 PAPERLESS_TIME_ZONE=$TZ_CHOICE
 PAPERLESS_OCR_LANGUAGE=eng
 PAPERLESS_SECRET_KEY=$SECRET
