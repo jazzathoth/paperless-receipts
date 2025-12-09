@@ -221,17 +221,17 @@ echo
 echo "Pulling Docker images (this may take a while)..."
 ( cd "$APP_DIR" && docker compose pull ) || echo "Warning: docker compose pull failed; you'll see errors on first start if images are missing."
 
-docker compose up --detach db
+cd "$APP_DIR" && docker compose up --detach db
 sleep 15
-docker compose stop
+cd "$APP_DIR" && docker compose stop
 
-docker compose run --rm \
+cd "$APP_DIR" && docker compose run --rm \
   -e DJANGO_SUPERUSER_PASSWORD="$PASSWORD" \
   webserver \
   createsuperuser --noinput --username "$USERNAME" --email "$USER_EMAIL"
 
 echo "Starting the containers:"
-docker compose up --detach
+cd "$APP_DIR" && docker compose up --detach
 sleep 15
 
 echo "Setting up the db for receipts"
@@ -273,7 +273,7 @@ done < <(jq -c '.workflows[]' "$CONFIG_JSON")
 
 sleep 5
 
-docker compose down
+cd "$APP_DIR" && docker compose down
 
 echo
 echo "Install complete."
