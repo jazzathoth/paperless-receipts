@@ -72,7 +72,7 @@ read -rp "Set email for user (for password recovery) [admin@example.com]: " USER
 USER_EMAIL="${USER_EMAIL:-admin@example.com}"
 
 while true; do
-  read -r -sp "Paperless password: " password
+  read -r -sp "Paperless password: " PASSWORD
   echo ""
 
   if [[ -z $PASSWORD ]] ; then
