@@ -85,6 +85,12 @@ fn process_cmd(
                 }
             }
         }
+        "export" => {
+            let _ = Command::new("docker")
+                .args(["compose", "exec", "-T", "webserver", "document_exporter", "/usr/src/paperless/export"])
+                .current_dir(app_dir)
+                .spawn();
+        }
 
         "quit" => {
             *running = is_up(app_dir);
