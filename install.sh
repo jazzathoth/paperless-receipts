@@ -123,6 +123,7 @@ DOWNLOAD_FILES=(
 "paperless_on.png"
 "paperless_off.png"
 "paperless_config.template.json"
+"Scripts/post_consume.py"
 )
 
 for r_path in "${DOWNLOAD_FILES[@]}"; do
