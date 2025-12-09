@@ -76,6 +76,10 @@ fn get_dir() -> String {
 
 
 fn main() {
+    #[cfg(target_os = "linux")]
+    gtk::init().expect("Failed to initialize GTK");
+
+
     let app_dir = get_dir();
 
     let running_icon = make_icon("paperless_on.png").unwrap();

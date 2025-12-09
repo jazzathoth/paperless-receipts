@@ -1209,6 +1209,7 @@ dependencies = [
 name = "paperless_receipts"
 version = "0.0.1"
 dependencies = [
+ "gtk",
  "image",
  "tray-icon",
 ]

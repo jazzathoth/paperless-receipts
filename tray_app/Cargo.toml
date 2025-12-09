@@ -6,4 +6,5 @@ edition = "2024"
 [dependencies]
 tray-icon = "0.21"
 image = "0.25"
+gtk = "0.18"
 
