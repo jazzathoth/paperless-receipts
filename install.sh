@@ -112,6 +112,7 @@ done
 
 
 TRAY_BIN="${APP_DIR}/paperless_receipts.bin"
+POST_CONSUME="${APP_DIR}/Scripts/post_consume.py"
 
 # Download files from repo
 DOWNLOAD_FILES=(
@@ -141,6 +142,10 @@ done
 
 if [ -f "$TRAY_BIN" ]; then
   chmod +x "$TRAY_BIN" || echo "Warning: could not make $TRAY_BIN executable"
+fi
+
+if [ -f "$POST_CONSUME" ]; then
+  chmod +x "$POST_CONSUME" || echo "Warning: could not make $POST_CONSUME executable"
 fi
 
 
