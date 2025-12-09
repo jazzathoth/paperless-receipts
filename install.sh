@@ -239,7 +239,7 @@ echo "Setting up the db for receipts"
 CONFIG_JSON="$APP_DIR/paperless_config.template.json"
 
 while IFS= read -r doc_type; do
-  curl -sS -u "$ADMIN USER:$ADMIN_PASS" \
+  curl -sS -u "$ADMIN_USER:$ADMIN_PASS" \
     -H "Content-Type: application/json" \
     -d "$doc_type" \
     "$PAPERLESS_URL/api/document_types/" \
