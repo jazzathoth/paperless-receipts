@@ -71,6 +71,9 @@ USERNAME="${USERNAME:-admin}"
 read -rp "Set email for user (for password recovery) [admin@example.com]: " USER_EMAIL
 USER_EMAIL="${USER_EMAIL:-admin@example.com}"
 
+PASSWORD=""
+PASSWORD_REPEAT=""
+
 while true; do
   read -r -sp "Paperless password: " PASSWORD
   echo ""
