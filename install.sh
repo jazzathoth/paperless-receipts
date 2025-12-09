@@ -245,7 +245,7 @@ while IFS= read -r doc_type; do
     -d "$doc_type" \
     "$PAPERLESS_URL/api/document_types/" \
     >/dev/null
-done < <(jq -c '.document_types[]' "$CONFIG_JSON")
+    done < <(jq -c '.document_types[] | del(.id)' "$CONFIG_JSON")
 
 while IFS= read -r tag; do
   curl -sS -u "$USERNAME:$PASSWORD" \
@@ -253,7 +253,7 @@ while IFS= read -r tag; do
        -d "$tag" \
        "$PAPERLESS_URL/api/tags/" \
        >/dev/null
-done < <(jq -c '.tags[]' "$CONFIG_JSON")
+       done < <(jq -c '.tags[] | del(.id)' "$CONFIG_JSON")
 
 while IFS= read -r field; do
   curl -sS -u "$USERNAME:$PASSWORD" \
@@ -261,7 +261,7 @@ while IFS= read -r field; do
        -d "$field" \
        "$PAPERLESS_URL/api/custom_fields/" \
        >/dev/null
-done < <(jq -c '.custom_fields[]' "$CONFIG_JSON")
+       done < <(jq -c '.custom_fields[] | del(.id)' "$CONFIG_JSON")
 
 while IFS= read -r wf; do
   curl -sS -u "$USERNAME:$PASSWORD" \
@@ -269,10 +269,10 @@ while IFS= read -r wf; do
        -d "$wf" \
        "$PAPERLESS_URL/api/workflows/" \
        >/dev/null
-done < <(jq -c '.workflows[]' "$CONFIG_JSON")
+       done < <(jq -c '.workflows[] | del(.id)' "$CONFIG_JSON")
 
 
-sleep 5
+sleep 15
 
 cd "$APP_DIR" && docker compose down
 
