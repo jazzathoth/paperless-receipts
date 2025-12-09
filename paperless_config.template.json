@@ -1,0 +1,235 @@
+{
+  "custom_fields": [
+    {
+      "data_type": "boolean",
+      "default_value": null,
+      "name": "Finished",
+      "required": null
+    },
+    {
+      "data_type": "monetary",
+      "default_value": null,
+      "name": "Amount",
+      "required": null
+    },
+    {
+      "data_type": "date",
+      "default_value": null,
+      "name": "Purchase Date",
+      "required": null
+    }
+  ],
+  "document_types": [
+    {
+      "is_insensitive": true,
+      "match": "BALANCE TAX RECEIPT SUBTOTAL MASTERCARD VISA TOTAL TRANSACTION INVOICE CASHIER STORE TICKET REGISTER CHANGE",
+      "matching_algorithm": 1,
+      "name": "Receipt"
+    }
+  ],
+  "tags": [
+    {
+      "color": "#30aec0",
+      "is_inbox_tag": false,
+      "name": "Inbox"
+    }
+  ],
+  "workflows": [
+    {
+      "actions": [
+        {
+          "assign_change_groups": [],
+          "assign_change_users": [],
+          "assign_correspondent": null,
+          "assign_custom_fields": [
+            1,
+            2,
+            3
+          ],
+          "assign_custom_fields_values": {
+            "1": null,
+            "2": null,
+            "3": false
+          },
+          "assign_document_type": null,
+          "assign_owner": null,
+          "assign_storage_path": null,
+          "assign_tags": [
+            1
+          ],
+          "assign_title": null,
+          "assign_view_groups": [],
+          "assign_view_users": [],
+          "email": null,
+          "id": 1,
+          "remove_all_correspondents": false,
+          "remove_all_custom_fields": false,
+          "remove_all_document_types": false,
+          "remove_all_owners": false,
+          "remove_all_permissions": false,
+          "remove_all_storage_paths": false,
+          "remove_all_tags": false,
+          "remove_change_groups": [],
+          "remove_change_users": [],
+          "remove_correspondents": [],
+          "remove_custom_fields": [],
+          "remove_document_types": [],
+          "remove_owners": [],
+          "remove_storage_paths": [],
+          "remove_tags": [],
+          "remove_view_groups": [],
+          "remove_view_users": [],
+          "type": 1,
+          "webhook": null
+        }
+      ],
+      "enabled": true,
+      "name": "Ingest",
+      "triggers": [
+        {
+          "filter_custom_field_query": null,
+          "filter_filename": null,
+          "filter_has_all_tags": [],
+          "filter_has_correspondent": null,
+          "filter_has_document_type": null,
+          "filter_has_not_correspondents": [],
+          "filter_has_not_document_types": [],
+          "filter_has_not_storage_paths": [],
+          "filter_has_not_tags": [],
+          "filter_has_storage_path": null,
+          "filter_has_tags": [],
+          "filter_mailrule": null,
+          "filter_path": null,
+          "id": 1,
+          "is_insensitive": true,
+          "match": "",
+          "matching_algorithm": 0,
+          "schedule_date_custom_field": null,
+          "schedule_date_field": "added",
+          "schedule_is_recurring": false,
+          "schedule_offset_days": 0,
+          "schedule_recurring_interval_days": 1,
+          "sources": [],
+          "type": 2
+        }
+      ]
+    },
+    {
+      "actions": [
+        {
+          "assign_change_groups": [],
+          "assign_change_users": [],
+          "assign_correspondent": null,
+          "assign_custom_fields": [],
+          "assign_custom_fields_values": {},
+          "assign_document_type": null,
+          "assign_owner": null,
+          "assign_storage_path": null,
+          "assign_tags": [],
+          "assign_title": null,
+          "assign_view_groups": [],
+          "assign_view_users": [],
+          "email": null,
+          "id": 2,
+          "remove_all_correspondents": false,
+          "remove_all_custom_fields": false,
+          "remove_all_document_types": false,
+          "remove_all_owners": false,
+          "remove_all_permissions": false,
+          "remove_all_storage_paths": false,
+          "remove_all_tags": false,
+          "remove_change_groups": [],
+          "remove_change_users": [],
+          "remove_correspondents": [],
+          "remove_custom_fields": [],
+          "remove_document_types": [],
+          "remove_owners": [],
+          "remove_storage_paths": [],
+          "remove_tags": [
+            1
+          ],
+          "remove_view_groups": [],
+          "remove_view_users": [],
+          "type": 2,
+          "webhook": null
+        },
+        {
+          "assign_change_groups": [],
+          "assign_change_users": [],
+          "assign_correspondent": null,
+          "assign_custom_fields": [],
+          "assign_custom_fields_values": {},
+          "assign_document_type": null,
+          "assign_owner": null,
+          "assign_storage_path": null,
+          "assign_tags": [],
+          "assign_title": null,
+          "assign_view_groups": [],
+          "assign_view_users": [],
+          "email": null,
+          "id": 3,
+          "remove_all_correspondents": false,
+          "remove_all_custom_fields": false,
+          "remove_all_document_types": false,
+          "remove_all_owners": false,
+          "remove_all_permissions": false,
+          "remove_all_storage_paths": false,
+          "remove_all_tags": false,
+          "remove_change_groups": [],
+          "remove_change_users": [],
+          "remove_correspondents": [],
+          "remove_custom_fields": [],
+          "remove_document_types": [],
+          "remove_owners": [],
+          "remove_storage_paths": [],
+          "remove_tags": [],
+          "remove_view_groups": [],
+          "remove_view_users": [],
+          "type": 4,
+          "webhook": {
+            "as_json": false,
+            "body": "{\n  \"url\": \"{{ doc_url }}\"\n}",
+            "headers": null,
+            "id": 1,
+            "include_document": false,
+            "params": {},
+            "url": "http://helper:5000/paperless-webhook",
+            "use_params": false
+          }
+        }
+      ],
+      "enabled": true,
+      "name": "Done",
+      "triggers": [
+        {
+          "filter_custom_field_query": "[\"AND\",[[3,\"exact\",\"true\"]]]",
+          "filter_filename": null,
+          "filter_has_all_tags": [
+            1
+          ],
+          "filter_has_correspondent": null,
+          "filter_has_document_type": null,
+          "filter_has_not_correspondents": [],
+          "filter_has_not_document_types": [],
+          "filter_has_not_storage_paths": [],
+          "filter_has_not_tags": [],
+          "filter_has_storage_path": null,
+          "filter_has_tags": [],
+          "filter_mailrule": null,
+          "filter_path": null,
+          "id": 2,
+          "is_insensitive": true,
+          "match": "",
+          "matching_algorithm": 0,
+          "schedule_date_custom_field": null,
+          "schedule_date_field": "added",
+          "schedule_is_recurring": false,
+          "schedule_offset_days": 0,
+          "schedule_recurring_interval_days": 1,
+          "sources": [],
+          "type": 3
+        }
+      ]
+    }
+  ]
+}

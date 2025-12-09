@@ -1,7 +1,7 @@
 mod server;
 use std::net::TcpStream;
 use std::os::unix::net::UnixStream;
-use std::io::{BufReader, BufRead, Write};
+use std::io::{BufReader, BufRead, Write, Read};
 use std::path::PathBuf;
 use std::process::Command;
 use std::sync::mpsc;
@@ -25,13 +25,46 @@ fn start_app() {
 
     let start = Instant::now();
     loop {
-        match TcpStream::connect(&address) {
-            Ok(_) => break,
-            Err(_) => {
-                if start.elapsed() >= Duration::from_secs(10){ break; }
-                sleep(Duration::from_millis(500));
+        // match TcpStream::connect(&address) {
+        //     Ok(stream) => {
+        //         let _ = stream.write_all(b"GET / HTTP/1.0\r\nHost: 127.0.0.1\r\n\r\n");
+        //         let mut buf = [0u8; 128];
+        //         if let Ok(n) = stream.read(&mut buf) {
+        //             if n > 0 {
+        //                 let head = String::from_utf8_lossy(&buf[..n]);
+        //                 if head.starts_with("HTTP/") {
+        //                     break;
+        //                 }
+        //             }
+        //         }
+        //     },
+        //     Err(_) => {
+        //         if start.elapsed() >= Duration::from_secs(10){ break; }
+        //         sleep(Duration::from_millis(500));
+        //     }
+        // }
+        if start.elapsed() >= Duration::from_secs(10) {
+            eprintln!("Timed out waiting for {} to become ready", URL);
+            break;
+        }
+
+        if let Ok(mut stream) = TcpStream::connect(address) {
+
+            let _ = stream.write_all(b"GET / HTTP/1.0\r\nHost: 127.0.0.1\r\n\r\n");
+
+            let mut buf = [0u8; 128];
+            if let Ok(n) = stream.read(&mut buf) {
+                if n > 0 {
+                    let head = String::from_utf8_lossy(&buf[..n]);
+                    if head.starts_with("HTTP/") {
+
+                        break;
+                    }
+                }
             }
         }
+
+        sleep(Duration::from_millis(500));
     }
 
     let chrome_like = [
@@ -43,7 +76,8 @@ fn start_app() {
 
     for bin in chrome_like {
         if Command::new(bin)
-            .args([ "--new-window", "--app", URL ])
+            // .arg([ "--new-window", format!("--app{}", URL).as_str() ])
+            .arg(format!("--app={}", URL))
             .spawn()
             .is_ok()
     {

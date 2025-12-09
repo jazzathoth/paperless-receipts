@@ -62,6 +62,34 @@ else
   fi
 fi
 
+
+# get user name and password:
+
+read -rp "Set username [admin]: " USERNAME
+USERNAME="${USERNAME:-admin}"
+
+read -rp "Set email for user (for password recovery) [admin@example.com]: " USER_EMAIL
+USER_EMAIL="${USER_EMAIL:-admin@example.com}"
+
+while true; do
+  read -r -sp "Paperless password: " password
+  echo ""
+
+  if [[ -z $PASSWORD ]] ; then
+    echo "Password cannot be empty."
+    continue
+  fi
+
+  read -r -sp "Paperless password (again): " PASSWORD_REPEAT
+  echo ""
+
+  if [[ ! "$PASSWORD" == "$PASSWORD_REPEAT" ]] ; then
+    echo "Passwords did not match"
+  else
+    break
+  fi
+done
+
 # Done collecting install info from user
 # Now make directories
 
@@ -91,6 +119,7 @@ DOWNLOAD_FILES=(
 "helper/Dockerfile"
 "paperless_on.png"
 "paperless_off.png"
+"paperless_config.template.json"
 )
 
 for r_path in "${DOWNLOAD_FILES[@]}"; do
@@ -186,8 +215,62 @@ echo "…or edit LLM_MODEL_PATH in .env if you use a different location."
 echo
 
 # 7) (Optional) Pre-pull images so first start is faster
-# echo "Pulling Docker images (this may take a while)..."
-# ( cd "$APP_DIR" && docker compose pull ) || echo "Warning: docker compose pull failed; you'll see errors on first start if images are missing."
+echo "Pulling Docker images (this may take a while)..."
+( cd "$APP_DIR" && docker compose pull ) || echo "Warning: docker compose pull failed; you'll see errors on first start if images are missing."
+
+docker compose up --detach db
+sleep 15
+docker compose stop
+
+docker compose run --rm \
+  -e DJANGO_SUPERUSER_PASSWORD="$PASSWORD" \
+  webserver \
+  createsuperuser --noinput --username "$USERNAME" --email "$USER_EMAIL"
+
+echo "Starting the containers:"
+docker compose up --detach
+sleep 15
+
+echo "Setting up the db for receipts"
+
+CONFIG_JSON="$APP_DIR/paperless_config.template.json"
+
+while IFS= read -r doc_type; do
+  curl -sS -u "$ADMIN USER:$ADMIN_PASS" \
+    -H "Content-Type: application/json" \
+    -d "$doc_type" \
+    "$PAPERLESS_URL/api/document_types/" \
+    >/dev/null
+done < <(jq -c '.document_types[]' "$CONFIG_JSON")
+
+while IFS= read -r tag; do
+  curl -sS -u "$ADMIN_USER:$ADMIN_PASS" \
+       -H "Content-Type: application/json" \
+       -d "$tag" \
+       "$PAPERLESS_URL/api/tags/" \
+       >/dev/null
+done < <(jq -c '.tags[]' "$CONFIG_JSON")
+
+while IFS= read -r field; do
+  curl -sS -u "$ADMIN_USER:$ADMIN_PASS" \
+       -H "Content-Type: application/json" \
+       -d "$field" \
+       "$PAPERLESS_URL/api/custom_fields/" \
+       >/dev/null
+done < <(jq -c '.custom_fields[]' "$CONFIG_JSON")
+
+while IFS= read -r wf; do
+  curl -sS -u "$ADMIN_USER:$ADMIN_PASS" \
+       -H "Content-Type: application/json" \
+       -d "$wf" \
+       "$PAPERLESS_URL/api/workflows/" \
+       >/dev/null
+done < <(jq -c '.workflows[]' "$CONFIG_JSON")
+
+
+sleep 5
+
+docker compose down
 
 echo
 echo "Install complete."
