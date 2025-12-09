@@ -239,7 +239,7 @@ echo "Setting up the db for receipts"
 CONFIG_JSON="$APP_DIR/paperless_config.template.json"
 
 while IFS= read -r doc_type; do
-  curl -sS -u "$ADMIN_USER:$ADMIN_PASS" \
+  curl -sS -u "$USERNAME:$PASSWORD" \
     -H "Content-Type: application/json" \
     -d "$doc_type" \
     "$PAPERLESS_URL/api/document_types/" \
@@ -247,7 +247,7 @@ while IFS= read -r doc_type; do
 done < <(jq -c '.document_types[]' "$CONFIG_JSON")
 
 while IFS= read -r tag; do
-  curl -sS -u "$ADMIN_USER:$ADMIN_PASS" \
+  curl -sS -u "$USERNAME:$PASSWORD" \
        -H "Content-Type: application/json" \
        -d "$tag" \
        "$PAPERLESS_URL/api/tags/" \
@@ -255,7 +255,7 @@ while IFS= read -r tag; do
 done < <(jq -c '.tags[]' "$CONFIG_JSON")
 
 while IFS= read -r field; do
-  curl -sS -u "$ADMIN_USER:$ADMIN_PASS" \
+  curl -sS -u "$USERNAME:$PASSWORD" \
        -H "Content-Type: application/json" \
        -d "$field" \
        "$PAPERLESS_URL/api/custom_fields/" \
@@ -263,7 +263,7 @@ while IFS= read -r field; do
 done < <(jq -c '.custom_fields[]' "$CONFIG_JSON")
 
 while IFS= read -r wf; do
-  curl -sS -u "$ADMIN_USER:$ADMIN_PASS" \
+  curl -sS -u "$USERNAME:$PASSWORD" \
        -H "Content-Type: application/json" \
        -d "$wf" \
        "$PAPERLESS_URL/api/workflows/" \
